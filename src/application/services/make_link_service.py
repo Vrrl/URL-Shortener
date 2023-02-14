@@ -1,9 +1,8 @@
-import random
-import string
 from fastapi import Depends
 
 from src.application.interfaces import MakeLinkUseCase, CacheManager
 from src.infra.cache import RedisCacheManager, InMemoryCacheManager
+from src.domain.entities import Link
 
 class MakeLinkService(MakeLinkUseCase):
 
@@ -12,9 +11,10 @@ class MakeLinkService(MakeLinkUseCase):
     def __init__(self, cache_manager: CacheManager = Depends(RedisCacheManager)):
         self.cache_manager = cache_manager
 
-    def handle(self, url: str) -> str:
-        key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    def handle(self, url: str) -> Link:
+        new_link = Link(url=url)
+        new_link.generate_key()
+        
+        self.cache_manager.save(new_link.key, new_link.url)
 
-        self.cache_manager.save(key, url)
-
-        return key
+        return new_link
