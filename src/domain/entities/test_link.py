@@ -2,9 +2,13 @@ import pytest
 from .link import Link
 
 def test_should_create_valid_link():
+    # Arrange
     url = 'www.google.com'
+
+    # Act
     new_link = Link(url=url)
 
+    # Assert
     assert new_link.url == url
 
 def test_should_not_create_invalid_link():
