@@ -4,10 +4,9 @@ from src.web.routes import (
     link_routes,
 )
 
-
 # Core Application Instance
 app = FastAPI(
-    title="Oasys Plumber",
+    title="URL Shortener",
     version="v0.0.1",
 )
 
