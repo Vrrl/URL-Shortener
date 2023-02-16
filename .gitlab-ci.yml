@@ -7,10 +7,17 @@ stages:
   - deploy
 
 variables: 
-  PROJECT_SHORT_NAME: bolinha
+  PROJECT_SHORT_NAME: URLShortner
 
-before_script:
-    - echo "ola mundo"
+lint_job:
+  stage: test
+  before_script:
+    - pip install black
+    - pip install flake8
+  script:
+    - black --fast .
+    - flake8 .
+  coverage: '/TOTAL.*\s+(\d+%)$/'
 
 test_job:
   stage: test
