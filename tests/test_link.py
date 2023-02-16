@@ -5,6 +5,8 @@ def test_should_save_new_valid_link(client):
     data = {
         "url": "teste.com"
     }
+    
+    assert 1 == 2
 
     # response = client.post(path + f"?url={data['url']}")
     # assert response.status_code == 200
