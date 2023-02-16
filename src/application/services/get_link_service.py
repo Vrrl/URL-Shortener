@@ -4,8 +4,8 @@ from src.application.interfaces import GetLinkUseCase, CacheManager
 from src.infra.cache import RedisCacheManager, InMemoryCacheManager
 from src.domain.entities import Link
 
-class GetLinkService(GetLinkUseCase):
 
+class GetLinkService(GetLinkUseCase):
     cache_manager: CacheManager
 
     def __init__(self, cache_manager: CacheManager = Depends(RedisCacheManager)):

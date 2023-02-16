@@ -1,5 +1,6 @@
 from src.application.interfaces import CacheManager
 
+
 class InMemoryCacheManager(CacheManager):
     memory: dict
 

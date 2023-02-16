@@ -6,18 +6,16 @@ from src.application.interfaces import GetLinkUseCase, MakeLinkUseCase
 
 router = APIRouter(tags=["links"])
 
+
 @router.get("/{key}")
 def redirect_link(
-    key: str,
-    get_link_use_case: GetLinkUseCase = Depends(GetLinkService)
+    key: str, get_link_use_case: GetLinkUseCase = Depends(GetLinkService)
 ):
     """Redirect to the corresponding link"""
     return get_link_use_case.handle(key)
 
+
 @router.post("/save")
-def save_link(
-    url: str,
-    make_link_use_case: MakeLinkUseCase = Depends(MakeLinkService)
-):
+def save_link(url: str, make_link_use_case: MakeLinkUseCase = Depends(MakeLinkService)):
     """save a new link"""
     return make_link_use_case.handle(url)
