@@ -1,20 +1,27 @@
-default:
-  image: python:latest
-  before_script:
-    - export VERSION=1.0.$(git rev-list --count HEAD)-$TAG
-    - pip install -r requirements.txt
+image: python:latest
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
+  PROJECT_VERSION: 1.0.$(git rev-list --count HEAD)-$TAG
 
-lint_job:
-  stage: test
+black_job:
+  stage: lint
+  before_script:
+    - pip install black
   script:
     - black --fast .
+
+flake8_job:
+  stage: lint
+  before_script:
+    - pip install flake8
+  script:
     - flake8 .
 
-test_job:
+pytest_job:
   stage: test
+  before_script:
+    - pip install -r requirements.txt
   script:
     - pytest . -v -s
   coverage: '/TOTAL.*\s+(\d+%)$/'
