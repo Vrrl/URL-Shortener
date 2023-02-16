@@ -1,30 +1,20 @@
-image: python:latest
-
-stages:
-  - lint
-  - test
-  - stagging
-  - deploy
+default:
+  image: python:latest
+  before_script:
+    - export VERSION=1.0.$(git rev-list --count HEAD)-$TAG
+    - pip install -r requirements.txt
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
 
 lint_job:
   stage: test
-  before_script:
-    - pip install black
-    - pip install flake8
   script:
     - black --fast .
     - flake8 .
-  coverage: '/TOTAL.*\s+(\d+%)$/'
 
 test_job:
   stage: test
-  before_script:
-    # Count the number of commits on branch
-    - export VERSION=1.0.$(git rev-list --count HEAD)-$TAG
   script:
-    - pip install -r requirements.txt
     - pytest . -v -s
   coverage: '/TOTAL.*\s+(\d+%)$/'
