@@ -1,1 +1,3 @@
-print("ola233123")
+print("1")
+print("3")
+print("2")
