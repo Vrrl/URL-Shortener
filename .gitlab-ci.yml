@@ -32,7 +32,7 @@ pytest_job:
     changes:
       - src/**/*
       - tests/*
-      - ./*.{py}
+      - ./*.py
   coverage: '/TOTAL.*\s+(\d+%)$/'
 
 deploy_stagging_job:
