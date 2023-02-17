@@ -7,7 +7,6 @@ stages:
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
-  PROJECT_VERSION: 1.0.$(git rev-list --count HEAD)-$TAG
 
 black_job:
   stage: lint
@@ -33,6 +32,10 @@ pytest_job:
 
 deploy_stagging_job:
   stage: deploy
+  variables:
+    TAG: stagging
+  before_script:
+    - export PROJECT_VERSION=1.0.$(git rev-list --count HEAD)-$TAG
   script:
     - printenv PROJECT_VERSION
   only:
@@ -40,6 +43,10 @@ deploy_stagging_job:
 
 deploy_production_job:
   stage: deploy
+  variables:
+    TAG: prod
+  before_script:
+    - export PROJECT_VERSION=1.0.$(git rev-list --count HEAD)-$TAG
   script:
     - printenv PROJECT_VERSION
   only:
