@@ -26,7 +26,7 @@ flake8_job:
 pytest_job:
   stage: test
   before_script:
-    - pip install -r requirements.txt
+    - pip install -r requirements.txt --user
   script:
     - pytest . -v -s
   coverage: '/TOTAL.*\s+(\d+%)$/'
