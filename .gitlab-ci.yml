@@ -30,3 +30,17 @@ pytest_job:
   script:
     - pytest . -v -s
   coverage: '/TOTAL.*\s+(\d+%)$/'
+
+deploy_stagging_job:
+  stage: deploy
+  script:
+    - printenv PROJECT_VERSION
+  only:
+    - stagging
+
+deploy_production_job:
+  stage: deploy
+  script:
+    - printenv PROJECT_VERSION
+  only:
+    - master
