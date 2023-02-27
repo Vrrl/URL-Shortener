@@ -8,7 +8,8 @@ class InMemoryCacheManager(CacheManager):
         self.memory = {}
 
     def get(self, key: str) -> str:
-        return self.memory[key]
+        if key in self.memory.keys():
+            return self.memory[key]
 
     def save(self, key: str, value: str) -> None:
         self.memory[key] = value
