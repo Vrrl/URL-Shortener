@@ -8,8 +8,8 @@ stages:
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
-  TAG_LATEST: yvrrl/url_shortener/$CI_COMMIT_REF_NAME:latest
-  TAG_COMMIT: yvrrl/url_shortener/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+  TAG_LATEST: yvrrl/url_shortener:latest
+  TAG_COMMIT: yvrrl/url_shortener:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
 
 black_job:
   stage: lint
