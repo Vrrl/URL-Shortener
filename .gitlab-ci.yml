@@ -8,33 +8,35 @@ stages:
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
+  TAG_LATEST: yvrrl/url_shortener/$CI_COMMIT_REF_NAME:latest
+  TAG_COMMIT: yvrrl/url_shortener/$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
 
-# black_job:
-#   stage: lint
-#   before_script:
-#     - pip install black
-#   script:
-#     - black --fast .
+black_job:
+  stage: lint
+  before_script:
+    - pip install black
+  script:
+    - black --fast .
 
-# flake8_job:
-#   stage: lint
-#   before_script:
-#     - pip install flake8
-#   script:
-#     - flake8 .
+flake8_job:
+  stage: lint
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 .
 
-# pytest_job:
-#   stage: test
-#   before_script:
-#     - pip install -r requirements.txt
-#   script:
-#     - pytest . -v -s
-#   only:
-#     changes:
-#       - src/**/*
-#       - tests/*
-#       - '*.py'
-#   coverage: '/TOTAL.*\s+(\d+%)$/'
+pytest_job:
+  stage: test
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - pytest . -v -s
+  only:
+    changes:
+      - src/**/*
+      - tests/*
+      - '*.py'
+  coverage: '/TOTAL.*\s+(\d+%)$/'
 
 build_docker_image:
   stage: build
@@ -44,30 +46,35 @@ build_docker_image:
   services:
     - docker:dind
   before_script:
-    - export PROJECT_VERSION=0.0.$TAG
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - docker build -t "yvrrl/url_shortener:$PROJECT_VERSION" .
-    - docker push "yvrrl/url_shortener:$PROJECT_VERSION"
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
   only:
     - stagging
     - tags
 
 deploy_stagging_job:
+  image: alpine:latest
   stage: deploy
-  variables:
-    TAG: stagging
-  before_script:
-    - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
+  # tags:
+  #   - deployment
   script:
-    - printenv PROJECT_VERSION
+    - chmod og= $ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f url-shortener || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --name url-shortener $TAG_COMMIT"
   only:
     - stagging
 
 deploy_production_job:
+  image: alpine:latest
   stage: deploy
-  variables:
-    TAG: prod
+  tags:
+    - deployment
   before_script:
     - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
   script:
