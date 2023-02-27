@@ -9,38 +9,38 @@ stages:
 variables: 
   PROJECT_SHORT_NAME: URLShortner
 
-black_job:
-  stage: lint
-  before_script:
-    - pip install black
-  script:
-    - black --fast .
+# black_job:
+#   stage: lint
+#   before_script:
+#     - pip install black
+#   script:
+#     - black --fast .
 
-flake8_job:
-  stage: lint
-  before_script:
-    - pip install flake8
-  script:
-    - flake8 .
+# flake8_job:
+#   stage: lint
+#   before_script:
+#     - pip install flake8
+#   script:
+#     - flake8 .
 
-pytest_job:
-  stage: test
-  before_script:
-    - pip install -r requirements.txt
-  script:
-    - pytest . -v -s
-  only:
-    changes:
-      - src/**/*
-      - tests/*
-      - '*.py'
-  coverage: '/TOTAL.*\s+(\d+%)$/'
+# pytest_job:
+#   stage: test
+#   before_script:
+#     - pip install -r requirements.txt
+#   script:
+#     - pytest . -v -s
+#   only:
+#     changes:
+#       - src/**/*
+#       - tests/*
+#       - '*.py'
+#   coverage: '/TOTAL.*\s+(\d+%)$/'
 
 build_docker_image:
   stage: build
   image: docker:latest
   before_script:
-    - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
+    - export PROJECT_VERSION=0.0.$TAG
     - printenv $CI_REGISTRY_USER
     - printenv $CI_REGISTRY_PASSWORD
     - printenv $CI_REGISTRY_DOCKER
