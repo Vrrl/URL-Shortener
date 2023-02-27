@@ -3,6 +3,7 @@ image: python:latest
 stages:
   - lint
   - test
+  - build
   - deploy
 
 variables: 
