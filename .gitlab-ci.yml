@@ -39,11 +39,10 @@ variables:
 build_docker_image:
   stage: build
   image: docker:latest
+  services:
+    - docker:dind
   before_script:
     - export PROJECT_VERSION=0.0.$TAG
-    - echo $CI_REGISTRY_USER
-    - echo $CI_REGISTRY_PASSWORD
-    - echo $CI_REGISTRY_DOCKER
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER
   script:
     - docker build -t "yvrrl/url_shortener:$PROJECT_VERSION" .
