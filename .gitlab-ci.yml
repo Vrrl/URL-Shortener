@@ -41,6 +41,9 @@ build_docker_image:
   image: docker:latest
   before_script:
     - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
+    - printenv $CI_REGISTRY_USER
+    - printenv $CI_REGISTRY_PASSWORD
+    - printenv $CI_REGISTRY_DOCKER
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER
   script:
     - docker build -t "yvrrl/url_shortener:$PROJECT_VERSION" .
