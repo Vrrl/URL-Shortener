@@ -35,7 +35,7 @@ variables:
 #       - tests/*
 #       - '*.py'
 #   coverage: '/TOTAL.*\s+(\d+%)$/'
-
+#
 build_docker_image:
   stage: build
   image: docker:latest
