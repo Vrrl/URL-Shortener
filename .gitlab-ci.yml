@@ -3,10 +3,13 @@ image: python:latest
 stages:
   - lint
   - test
+  - build
   - deploy
 
 variables: 
   PROJECT_SHORT_NAME: URLShortner
+  TAG_LATEST: yvrrl/url_shortener:latest
+  TAG_COMMIT: yvrrl/url_shortener:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
 
 black_job:
   stage: lint
@@ -14,6 +17,9 @@ black_job:
     - pip install black
   script:
     - black --fast .
+  except:
+    - stagging
+    - master
 
 flake8_job:
   stage: lint
@@ -21,6 +27,9 @@ flake8_job:
     - pip install flake8
   script:
     - flake8 .
+  except:
+    - stagging
+    - master
 
 pytest_job:
   stage: test
@@ -35,24 +44,46 @@ pytest_job:
       - '*.py'
   coverage: '/TOTAL.*\s+(\d+%)$/'
 
-deploy_stagging_job:
-  stage: deploy
+build_docker_image:
+  stage: build
+  image: docker:latest
   variables:
-    TAG: stagging
+    DOCKER_TLS_CERTDIR: ""
+  services:
+    - docker:dind
   before_script:
-    - export PROJECT_VERSION=1.0.$(git rev-list --count HEAD)-$TAG
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - printenv PROJECT_VERSION
+    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+  only:
+    - stagging
+    - tags
+
+deploy_stagging_job:
+  image: alpine:latest
+  stage: deploy
+  # tags:
+  #   - deployment
+  script:
+    - chmod og= $ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY_DOCKER"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f url-shortener || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --name url-shortener $TAG_COMMIT"
   only:
     - stagging
 
 deploy_production_job:
+  image: alpine:latest
   stage: deploy
-  variables:
-    TAG: prod
+  tags:
+    - deployment
   before_script:
-    - export PROJECT_VERSION=1.0.$(git rev-list --count HEAD)-$TAG
+    - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
   script:
     - printenv PROJECT_VERSION
   only:
-    - master
+    - tags

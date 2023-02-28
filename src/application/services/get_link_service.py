@@ -8,7 +8,7 @@ from src.domain.entities import Link
 class GetLinkService(GetLinkUseCase):
     cache_manager: CacheManager
 
-    def __init__(self, cache_manager: CacheManager = Depends(RedisCacheManager)):
+    def __init__(self, cache_manager: CacheManager = Depends(InMemoryCacheManager)):
         self.cache_manager = cache_manager
 
     def handle(self, key: str) -> Link:
