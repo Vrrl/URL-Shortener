@@ -1,5 +1,3 @@
-image: python:latest
-
 stages:
   - lint
   - test
@@ -12,7 +10,11 @@ variables:
   TAG_COMMIT: yvrrl/url_shortener:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
 
 black_job:
+  image: python:3.10
   stage: lint
+  tags:
+    - python
+    - python:3.10
   before_script:
     - pip install black
   script:
@@ -22,7 +24,11 @@ black_job:
     - master
 
 flake8_job:
+  image: python:3.10
   stage: lint
+  tags:
+    - python
+    - python:3.10
   before_script:
     - pip install flake8
   script:
@@ -32,7 +38,11 @@ flake8_job:
     - master
 
 pytest_job:
+  image: python:3.10
   stage: test
+  tags:
+    - python
+    - python:3.10
   before_script:
     - pip install -r requirements.txt
   script:
@@ -64,15 +74,15 @@ build_docker_image:
 deploy_stagging_job:
   image: alpine:latest
   stage: deploy
-  # tags:
-  #   - deployment
+  tags:
+    - internal
   script:
-    - chmod og= $ID_RSA
+    - chmod og= $ID_RSA_STAGE
     - apk update && apk add openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY_DOCKER"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f url-shortener || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --name url-shortener $TAG_COMMIT"
+    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY_DOCKER"
+    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker pull $TAG_COMMIT"
+    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker container rm -f url-shortener || true"
+    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker run -d -p 80:8000 --name url-shortener $TAG_COMMIT"
   only:
     - stagging
 
@@ -80,7 +90,7 @@ deploy_production_job:
   image: alpine:latest
   stage: deploy
   tags:
-    - deployment
+    - internal
   before_script:
     - export PROJECT_VERSION=0.0.$(git rev-list --count HEAD)-$TAG
   script:
