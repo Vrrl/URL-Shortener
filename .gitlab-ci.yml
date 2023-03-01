@@ -62,17 +62,11 @@ build_docker_image:
   services:
     - docker:dind
   before_script:
-    - echo "$CI_REGISTRY_USER"
-    - echo "$CI_REGISTRY_PASSWORD"
-    - echo "$CI_REGISTRY_DOCKER"
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - echo "$CI_REGISTRY_USER"
-    - echo "$CI_REGISTRY_PASSWORD"
-    - echo "$CI_REGISTRY_DOCKER"
-    # - docker build -t $TAG_COMMIT `if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "-t $TAG_LATEST"; fi` .
-    # - docker push $TAG_COMMIT
-    # - if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "docker push $TAG_LATEST"; fi
+    - docker build -t $TAG_COMMIT `if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "-t $TAG_LATEST"; fi` .
+    - docker push $TAG_COMMIT
+    - if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "docker push $TAG_LATEST"; fi
   only:
     - stagging
     - tags
