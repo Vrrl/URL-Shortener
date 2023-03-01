@@ -64,9 +64,12 @@ build_docker_image:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - docker build -t $TAG_COMMIT `if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "-t $TAG_LATEST"; fi` .
-    - docker push $TAG_COMMIT
-    - if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "docker push $TAG_LATEST"; fi
+    - echo "$CI_REGISTRY_USER"
+    - echo "$CI_REGISTRY_PASSWORD"
+    - echo "$CI_REGISTRY_DOCKER"
+    # - docker build -t $TAG_COMMIT `if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "-t $TAG_LATEST"; fi` .
+    # - docker push $TAG_COMMIT
+    # - if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "docker push $TAG_LATEST"; fi
   only:
     - stagging
     - tags
@@ -94,7 +97,7 @@ deploy_production_job:
   # tags:
   #   - internal
   before_script:
-    - export PROJECT_VERSION=$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-0.0.$(git rev-list --count HEAD)
+    - export PROJECT_VERSION=$TAG.$(git rev-list --count HEAD)
   script:
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
