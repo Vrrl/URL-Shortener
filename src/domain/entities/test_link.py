@@ -14,7 +14,7 @@ def test_should_create_valid_link():
 
 
 def test_should_not_create_invalid_link():
-    url = "teste123"
+    url = "teste1234"
     with pytest.raises(Exception):
         Link(url=url)
 
