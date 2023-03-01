@@ -64,9 +64,9 @@ build_docker_image:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - docker build -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker build -t $TAG_COMMIT `if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "-t $TAG_LATEST"; fi` .
     - docker push $TAG_COMMIT
-    - docker push $TAG_LATEST
+    - if [ $CI_COMMIT_REF_NAME == 'master' ]; then echo "docker push $TAG_LATEST"; fi
   only:
     - stagging
     - tags
@@ -102,6 +102,5 @@ deploy_production_job:
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f url-shortener || true"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --name url-shortener $TAG_COMMIT"
-
   only:
     - tags
