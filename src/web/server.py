@@ -9,5 +9,5 @@ app = FastAPI(
 )
 
 # Add Routers
-app.include_router(link_routes.router)
 app.include_router(misc_routes.router)
+app.include_router(link_routes.router)

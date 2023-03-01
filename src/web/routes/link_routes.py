@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.application.services import GetLinkService, MakeLinkService
 from src.application.interfaces import GetLinkUseCase, MakeLinkUseCase
 
-router = APIRouter()
+router = APIRouter(tags=["links"])
 
 
 @router.get("/{key}")

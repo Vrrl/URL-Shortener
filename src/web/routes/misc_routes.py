@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 
-router = APIRouter(tags=["links"])
+router = APIRouter()
 
 
 @router.get("/healthcheck")
