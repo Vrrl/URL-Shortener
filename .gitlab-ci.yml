@@ -85,7 +85,7 @@ deploy_stagging_job:
     - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY_DOCKER"
     - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker pull $TAG_COMMIT"
     - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker container rm -f url-shortener || true"
-    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker run -d -p 80:8000 --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
+    - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker run -d -p 80:8000 --restart always --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
   only:
     - stagging
 
@@ -95,13 +95,14 @@ deploy_production_job:
   # tags:
   #   - internal
   before_script:
-    - export PROJECT_VERSION=$CI_COMMIT_REF_NAME.$(git rev-list --count HEAD)
+    - export PROJECT_VERSION=$CI_COMMIT_REF_NAME.`git rev-list --count HEAD``
   script:
+    - git rev-list --count HEAD
     - chmod og= $ID_RSA
     - apk update && apk add openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u '$CI_REGISTRY_USER' -p '$CI_REGISTRY_PASSWORD' $CI_REGISTRY_DOCKER"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f url-shortener || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --restart always --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
   only:
     - tags
