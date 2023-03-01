@@ -64,7 +64,7 @@ build_docker_image:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
-    - printenv $CI_COMMIT_REF_NAME
+    - echo "$CI_COMMIT_REF_NAME"
     - docker build -t $TAG_COMMIT `if [[ "$CI_COMMIT_REF_NAME" == *"prod"* ]]; then echo "-t $TAG_LATEST"; fi` .
     - docker push $TAG_COMMIT
     - if [[ "$CI_COMMIT_REF_NAME" == *"prod"* ]]; then echo "docker push $TAG_LATEST"; fi
