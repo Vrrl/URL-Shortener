@@ -95,7 +95,7 @@ deploy_production_job:
   # tags:
   #   - internal
   before_script:
-    - export PROJECT_VERSION=$CI_COMMIT_REF_NAME.`git rev-list --count HEAD``
+    - export PROJECT_VERSION=$CI_COMMIT_REF_NAME.`git rev-list --count HEAD`
   script:
     - git rev-list --count HEAD
     - chmod og= $ID_RSA
