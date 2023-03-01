@@ -62,6 +62,9 @@ build_docker_image:
   services:
     - docker:dind
   before_script:
+    - echo "$CI_REGISTRY_USER"
+    - echo "$CI_REGISTRY_PASSWORD"
+    - echo "$CI_REGISTRY_DOCKER"
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY_DOCKER 
   script:
     - echo "$CI_REGISTRY_USER"
