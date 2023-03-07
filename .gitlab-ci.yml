@@ -67,14 +67,21 @@ pytest_job:
   before_script:
     - pip install -r requirements.txt
   script:
-    - pytest . -v -s
+    - pytest . --cov -v -s --cov-fail-under=60 --cov-report=xml:coverage.xml
     - pip show pytest
   only:
     changes:
       - src/**/*
       - tests/*
       - '*.py'
-  coverage: '/TOTAL.*\s+(\d+%)$/'
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    paths:
+      - coverage/cobertura-coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 build_docker_image:
   stage: build
