@@ -76,6 +76,7 @@ pytest_job:
       - '*.py'
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
+    expire_in: 7 days
     reports:
       coverage_report:
         coverage_format: cobertura
