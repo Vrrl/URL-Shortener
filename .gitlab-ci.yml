@@ -15,6 +15,13 @@ black_job:
   tags:
     - python
     - python:3.10
+  cache:
+    key:
+      files:
+        - requirements.txt
+    paths:
+      - "/usr/local/lib/python3.10/site-packages"
+    policy: pull
   before_script:
     - pip install black
   script:
@@ -29,6 +36,13 @@ flake8_job:
   tags:
     - python
     - python:3.10
+  cache:
+    key:
+      files:
+        - requirements.txt
+    paths:
+      - "/usr/local/lib/python3.10/site-packages"
+    policy: pull
   before_script:
     - pip install flake8
   script:
@@ -43,10 +57,18 @@ pytest_job:
   tags:
     - python
     - python:3.10
+  cache:
+    key:
+      files:
+        - requirements.txt
+    paths:
+      - "/usr/local/lib/python3.10/site-packages"
+    policy: pull-push
   before_script:
     - pip install -r requirements.txt
   script:
     - pytest . -v -s
+    - pip show pytest
   only:
     changes:
       - src/**/*
@@ -88,6 +110,10 @@ deploy_stagging_job:
     - ssh -i $ID_RSA_STAGE -o StrictHostKeyChecking=no $SERVER_USER_STAGE@$SERVER_IP_STAGE -p $SERVER_SSH_PORT_STAGE "docker run -d -p 80:8000 --restart always --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
   only:
     - stagging
+  environment:
+    name: internal-staging-pti
+    deployment_tier: staging
+    url: http://179.106.229.16:9080/docs
 
 deploy_production_job:
   image: alpine:latest
@@ -105,3 +131,7 @@ deploy_production_job:
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8000 --restart always --name url-shortener -e PROJECT_VERSION=`printenv PROJECT_VERSION` $TAG_COMMIT"
   only:
     - tags
+  environment:
+    name: aws-ec2-freetier-production
+    deployment_tier: production
+    url: http://35.172.234.30/docs

@@ -1,3 +1,7 @@
+<p align="center">
+  [![coverage report](https://git.pti.org.br/lab-ia-it/url_shortener/badges/master/coverage.svg)](https://git.pti.org.br/lab-ia-it/url_shortener/-/commits/master)
+  [![pipeline status](https://git.pti.org.br/lab-ia-it/url_shortener/badges/master/pipeline.svg)](https://git.pti.org.br/lab-ia-it/url_shortener/-/commits/master)
+</p>
 # Url Shortener
 This project is a URL shortener implemented using Python 3.9+ and the FastAPI web framework. The purpose of the project is to serve as an example for implementing continuous integration and deployment (CI/CD) practices, such as automated testing and automated production deployment.
 
